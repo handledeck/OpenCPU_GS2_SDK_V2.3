@@ -1,0 +1,5 @@
+;Building Log 
+Warning: L6305W: Image does not have an entry point. (Not specified or not set due to multiple choices.)
+"build\scat6252.txt", line 22 (column 10): Warning: L6314W: No section matches pattern *(NVRW).
+"build\scat6252.txt", line 22 (column 16): Warning: L6314W: No section matches pattern *(NVZI).
+Finished: 0 information, 3 warning and 0 error messages.

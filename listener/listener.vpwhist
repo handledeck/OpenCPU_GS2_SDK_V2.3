@@ -1,0 +1,41 @@
+[Global]
+CurrentProject=Listener.vpj
+[ActiveConfig]
+Listener.vpj=Debug
+[ProjectDates]
+Listener.vpj=20141128084751368
+[TreeExpansion2]
+-@ Listener.vpj
+  - Source Files
+  - Header Files
+  + Resource Files
+  + Bitmaps
+  + Other Files
+scroll:0
+[State]
+SCREEN: 1920 975 360 69 1246 882 0 0 M 0 0 0 0 1553 859 0
+CWD: ..\listener
+BUFFER: BN="source\entry.c"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=8 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=120783456 TL=0 MLL=0 ASE=0 LNL=1 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2072 CL=54 LE=0 CX=54 CY=22 WI=5 BI=10 HT=0 HN=0 HF=0 HC=4
+WINDOW: 1 22 1551 836 0 0 N  WF=0 WT=2 ",,," DID=0
+BUFFER: BN="source\entry.c"
+VIEW: LN=.2072 CL=54 LE=0 CX=54 CY=22 WI=124 BI=10 HT=0 HN=0 HF=0 HC=4
+MDISTATE: 1
+AAAAAAAAAAHaAAAAAAAAADQAAAd/AAADpeoAAAAC+gAAAAEAAAABAAAAAPoAAAABAAAAAQAAAAD8AAAAiAAyADoAOgA6AEMAOgBcAFAAcgBvAGoAZQBjAHQAXABRAHUAaQBjAGsAdABlAGwAXABPAHAAZQBuAEMAUABVAF8ARwBTADIAXwBTAEQASwBfAFYAMgAuADMAXABsAGkAcwB0AGUAbgBlAHIAXABzAG8AdQByAGMAZQBcAGUAbgB0AHIAeQAuAGMBAP////8AAQ==
+FILEHIST: 9
+..\test\include\files.h
+..\qlinc\ql_appinit.h
+..\qlinc\ql_trace.h
+..\test\source\global.c
+..\test\include\utils.h
+..\test\include\global.h
+..\test\source\utils.c
+..\test\source\entry.c
+source\entry.c
+TBCLASS: 0 0
+DEBUG: 0 0 0 0 3 0 gdb
+printf
+strcpy
+std::*
+DEBUG2: 0

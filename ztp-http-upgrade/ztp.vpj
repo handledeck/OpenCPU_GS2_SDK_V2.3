@@ -1,0 +1,274 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+	Version="10.0"
+	VendorName="SlickEdit"
+	TemplateName="GNU C/C++"
+	WorkingDir=".">
+	<Config
+		Name="Debug"
+		Type="gnuc"
+		DebugCallbackName="gdb"
+		Version="1"
+		OutputFile="%bdztp.exe"
+		CompilerConfigName="Latest Version"
+		Defines='"/D__ENTRY_"'>
+		<Menu>
+			<Target
+				Name="Compile"
+				MenuCaption="&amp;Compile"
+				Dialog="_gnuc_options_form Compile"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				OutputExts="*.o"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec CmdLine='-c -c %xup %defd -o "%bd%n%oe" %i %f'/>
+			</Target>
+			<Target
+				Name="Link"
+				MenuCaption="&amp;Link"
+				ShowOnMenu="Never"
+				Dialog="_gnuc_options_form Link"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec CmdLine='gcc %xup -o "%o" %objs'/>
+			</Target>
+			<Target
+				Name="Build"
+				MenuCaption="&amp;Build"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine="make"/>
+			</Target>
+			<Target
+				Name="Rebuild"
+				MenuCaption="&amp;Rebuild"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine=""/>
+			</Target>
+			<Target
+				Name="Debug"
+				MenuCaption="&amp;Debug"
+				Dialog="_gnuc_options_form Run/Debug"
+				BuildFirst="1"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec CmdLine='vsdebugio -prog "%o"'/>
+			</Target>
+			<Target
+				Name="Execute"
+				MenuCaption="E&amp;xecute"
+				Dialog="_gnuc_options_form Run/Debug"
+				BuildFirst="1"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine='"%o"'/>
+			</Target>
+			<Target
+				Name="dash"
+				MenuCaption="-"
+				Deletable="0">
+				<Exec/>
+			</Target>
+			<Target
+				Name="GNU C Options"
+				MenuCaption="GNU C &amp;Options..."
+				ShowOnMenu="HideIfNoCmdLine"
+				Deletable="0"
+				SaveOption="SaveNone">
+				<Exec
+					CmdLine="gnucoptions"
+					Type="Slick-C"/>
+			</Target>
+		</Menu>
+		<List Name="GNUC Options">
+			<Item
+				Name="LinkerOutputType"
+				Value="Executable"/>
+		</List>
+		<Includes>
+			<Include Dir="C:/Project/Quicktel/old_OpenCPU_GS2_SDK_V2.3/qlinc/"/>
+			<Include Dir="C:/Project/Quicktel/old_OpenCPU_GS2_SDK_V2.3/ztp-1/include/"/>
+			<Include Dir="C:/Program Files/ARM/RVCT/Data/3.1/569/include/windows/"/>
+		</Includes>
+		<Libs PreObjects="0"/>
+	</Config>
+	<Config
+		Name="Release"
+		Type="gnuc"
+		DebugCallbackName="gdb"
+		Version="1"
+		OutputFile="%bdztp.exe"
+		CompilerConfigName="Latest Version"
+		Defines='"/D__ENTRY_"'>
+		<Menu>
+			<Target
+				Name="Compile"
+				MenuCaption="&amp;Compile"
+				Dialog="_gnuc_options_form Compile"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				OutputExts="*.o"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec CmdLine='-c -c %xup %defd -o "%bd%n%oe" %i %f'/>
+			</Target>
+			<Target
+				Name="Link"
+				MenuCaption="&amp;Link"
+				ShowOnMenu="Never"
+				Dialog="_gnuc_options_form Link"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec CmdLine='gcc %xup -o "%o" %objs'/>
+			</Target>
+			<Target
+				Name="Build"
+				MenuCaption="&amp;Build"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine="make"/>
+			</Target>
+			<Target
+				Name="Rebuild"
+				MenuCaption="&amp;Rebuild"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine=""/>
+			</Target>
+			<Target
+				Name="Debug"
+				MenuCaption="&amp;Debug"
+				Dialog="_gnuc_options_form Run/Debug"
+				BuildFirst="1"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec CmdLine='vsdebugio -prog "%o"'/>
+			</Target>
+			<Target
+				Name="Execute"
+				MenuCaption="E&amp;xecute"
+				Dialog="_gnuc_options_form Run/Debug"
+				BuildFirst="1"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine='"%o"'/>
+			</Target>
+			<Target
+				Name="dash"
+				MenuCaption="-"
+				Deletable="0">
+				<Exec/>
+			</Target>
+			<Target
+				Name="GNU C Options"
+				MenuCaption="GNU C &amp;Options..."
+				ShowOnMenu="HideIfNoCmdLine"
+				Deletable="0"
+				SaveOption="SaveNone">
+				<Exec
+					CmdLine="gnucoptions"
+					Type="Slick-C"/>
+			</Target>
+		</Menu>
+		<List Name="GNUC Options">
+			<Item
+				Name="LinkerOutputType"
+				Value="Executable"/>
+		</List>
+		<Includes>
+			<Include Dir="C:/Project/Quicktel/old_OpenCPU_GS2_SDK_V2.3/qlinc/"/>
+			<Include Dir="C:/Project/Quicktel/old_OpenCPU_GS2_SDK_V2.3/ztp-1/include/"/>
+			<Include Dir="C:/Program Files/ARM/RVCT/Data/3.1/569/include/windows/"/>
+		</Includes>
+		<Libs PreObjects="0"/>
+	</Config>
+	<Files>
+		<Folder
+			Name="Source Files"
+			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go">
+			<F N="config/config.c"/>
+			<F N="source/entry.c"/>
+			<F N="source/events.c"/>
+			<F N="source/files.c"/>
+			<F N="source/global.c"/>
+			<F N="source/mgpio.c"/>
+			<F N="source/socket.c"/>
+			<F N="source/store.c"/>
+			<F N="source/transport.c"/>
+			<F N="source/utils.c"/>
+			<F N="source/websrv.c"/>
+		</Folder>
+		<Folder
+			Name="Header Files"
+			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
+			<F N="include/crc.h"/>
+			<F N="include/events.h"/>
+			<F N="include/files.h"/>
+			<F N="include/global.h"/>
+			<F N="include/mgpio.h"/>
+			<F N="../qlinc/ql_api_type.h"/>
+			<F N="../qlinc/ql_appinit.h"/>
+			<F N="../qlinc/ql_audio.h"/>
+			<F N="../qlinc/ql_bus.h"/>
+			<F N="../qlinc/ql_call.h"/>
+			<F N="../qlinc/ql_error.h"/>
+			<F N="../qlinc/ql_fcm.h"/>
+			<F N="../qlinc/ql_filesystem.h"/>
+			<F N="../qlinc/ql_font.h"/>
+			<F N="../qlinc/ql_fota.h"/>
+			<F N="../qlinc/ql_ftp.h"/>
+			<F N="../qlinc/ql_i2c.h"/>
+			<F N="../qlinc/ql_interface.h"/>
+			<F N="../qlinc/ql_memory.h"/>
+			<F N="../qlinc/Ql_multitask.h"/>
+			<F N="../qlinc/ql_pin.h"/>
+			<F N="../qlinc/ql_sim.h"/>
+			<F N="../qlinc/ql_sms.h"/>
+			<F N="../qlinc/ql_stdlib.h"/>
+			<F N="../qlinc/Ql_tcpip.h"/>
+			<F N="../qlinc/ql_timer.h"/>
+			<F N="../qlinc/ql_trace.h"/>
+			<F N="../qlinc/ql_tts.h"/>
+			<F N="../qlinc/ql_type.h"/>
+			<F N="../qlinc/ql_utility.h"/>
+			<F N="../qlinc/sdconfig.h"/>
+			<F N="include/socket.h"/>
+			<F N="/Program Files/ARM/RVCT/Data/3.1/569/include/windows/stdarg.h"/>
+			<F N="include/store.h"/>
+			<F N="include/transport.h"/>
+			<F N="include/utils.h"/>
+			<F N="include/websrv.h"/>
+		</Folder>
+		<Folder
+			Name="Resource Files"
+			Filters="*.ico;*.cur;*.dlg"/>
+		<Folder
+			Name="Bitmaps"
+			Filters="*.bmp"/>
+		<Folder
+			Name="Other Files"
+			Filters=""/>
+	</Files>
+</Project>

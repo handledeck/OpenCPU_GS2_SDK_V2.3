@@ -1,0 +1,163 @@
+
+#-------------------------------------------------------------------------------
+# config tools, tool path
+#-------------------------------------------------------------------------------
+DIR_ARM=$(strip $(ARMTOOL_PATH))
+DIR_TOOL       =  $(DIR_ARM)\Programs\3.1\569\win_32-pentium
+DIR_ARMLIB     =  $(DIR_ARM)\Data\3.1\569\lib
+DIR_ARMINC     =  $(DIR_ARM)\Data\3.1\569\include
+DIR_TOOL      := $(strip $(DIR_TOOL))
+CC32 		   = $(DIR_TOOL)\armcc.exe --arm
+CC			   = $(DIR_TOOL)\armcc.exe --thumb
+LINK           =  $(DIR_TOOL)\armlink.exe          # Linker
+ASM            =  $(DIR_TOOL)\armasm.exe           # ARM assembler
+AR             =  $(DIR_TOOL)\armar.exe            # Library tool
+FROMELF        =  $(DIR_TOOL)\fromelf.exe          # Binary tool
+MAKE		   = make.exe
+
+#-------------------------------------------------------------------------------
+# config dir, other file
+#-------------------------------------------------------------------------------
+
+BIN_DIR=build
+OBJDIR=$(strip $(BIN_DIR))\obj
+OBJLIST=$(strip $(BIN_DIR))\~objlist.tmp
+DEFVIATMP=$(strip $(BIN_DIR))\~makedef.tmp
+BUILDLOG=$(strip $(BIN_DIR))\build.log
+SCATTER_FILE= $(strip $(BIN_DIR))\scat6252.txt
+SYM_INPUTVIA=$(strip $(BIN_DIR))\~coresymlnk.tmp
+
+#-------------------------------------------------------------------------------
+# config output bin
+#-------------------------------------------------------------------------------
+BIN_OUTPUT=$(strip $(BIN_DIR))\$(strip $(PLATFORM))$(strip $(MEMORY))_$(strip $(VERSION)).bin
+ELF_OUTPUT=$(strip $(BIN_DIR))\$(strip $(PLATFORM))$(strip $(MEMORY))_$(strip $(VERSION)).elf 
+LIS_OUTPUT=$(strip $(BIN_DIR))\$(strip $(PLATFORM))$(strip $(MEMORY))_$(strip $(VERSION)).lis 
+SYM_OUTPUT=$(strip $(BIN_DIR))\$(strip $(PLATFORM))$(strip $(MEMORY))_$(strip $(VERSION)).sym
+
+
+#-------------------------------------------------------------------------------
+# config core sym
+#-------------------------------------------------------------------------------
+INNERLIB=..\libs\app_start.lib(*.o)
+
+#-------------------------------------------------------------------------------
+# config compiler, linker opt
+#-------------------------------------------------------------------------------
+C_FLAGS =  --cpu=ARM7EJ-S --littleend -O2  --apcs /interwork  -c  --c99    # --zo -fpu None ---no float
+C_DEF= -DMT6252
+S_FLAGS = --littleend --cpu=ARM7EJ-S  --apcs /interwork  --debug            #   -keep -fpu None
+S_DEF = --pd="MT6252 SETL {TRUE}"
+AR_FLAGS = --create
+vpath %.o ..\$(OBJDIR)
+
+SCATTER=--scatter $(SCATTER_FILE)
+LISTEN=--list  $(LIS_OUTPUT) --map --xref --symbols 
+SYMDEF=--symdefs $(SYM_OUTPUT)
+
+
+
+TempParantDir = $(shell cd)
+
+#-------------------------------------------------------------------------------
+# config dep
+#-------------------------------------------------------------------------------
+new: mngdir prepare  compilerdir linkprog
+	@echo Creating $(BIN_OUTPUT)
+	$(FROMELF)  --output $(BIN_OUTPUT) --bin	$(ELF_OUTPUT)
+	@del /f .\$(OBJLIST)
+	@echo ----------------------------------------------
+	@echo Compiling Finished Sucessfully.
+	@echo The target image is in the '$(BIN_DIR)' directory.
+	@echo ----------------------------------------------
+
+mngdir:
+	@if not exist $(BIN_DIR)  (md $(BIN_DIR))
+	@if not exist $(OBJDIR)  (md $(OBJDIR))
+
+prepare:
+	@if exist $(strip $(BIN_DIR))\*.bin \
+		@del /f  $(strip $(BIN_DIR))\*.bin
+	@if exist $(strip $(BIN_DIR))\*.elf \
+		@del /f  $(strip $(BIN_DIR))\*.elf
+	@if exist $(strip $(BIN_DIR))\*.lis \
+		@del /f  $(strip $(BIN_DIR))\*.lis
+	@if exist $(strip $(BIN_DIR))\*.sym \
+		@del /f  $(strip $(BIN_DIR))\*.sym
+	@if exist .\$(OBJLIST) \
+		@del /f .\$(OBJLIST)
+	@xcopy /Y /F ..\qlcode\scat6252M64.txt build\scat6252.txt
+	@echo ;objlist > .\$(OBJLIST)
+	@echo ;Building Log > .\$(BUILDLOG)
+
+
+compilerdir:
+	@echo -D__ENTRY__ >> .\$(DEFVIATMP)
+	@echo  $(BUILD_DIRS)
+	@for /d %%y in ($(BUILD_DIRS)) do \
+		@if exist %%y \
+			@$(MAKE) -C %%y  
+	@del /f .\$(DEFVIATMP)
+#2>>.\$(BUILDLOG)
+
+
+mksubpaths:
+	@echo subdir... $(SUBPATHS)
+	@for /d %%y in ($(SUBPATHS)) do \
+		@if not exist ..\$(OBJDIR)\%%y  \
+			((@echo md $ ..\$(OBJDIR)\%%y ) & \
+			(md $ ..\$(OBJDIR)\%%y))
+
+linkprog:
+	@echo Linking $(ELF_OUTPUT)
+	@$(LINK)  -o $(ELF_OUTPUT) $(SCATTER) $(INNERLIB) $(LISTEN) $(SYMDEF) --VIA $(OBJLIST) $(LIBS)  2>>.\$(BUILDLOG)
+
+disasm:
+	@echo ********dis asm**********
+	$(FROMELF)  -c	$(strip $(ELF_OUTPUT))	>$(strip $(ELF_OUTPUT)).asm
+
+clean:
+	@echo Cleaning all file
+	@if exist $(strip $(BIN_DIR))\*.bin \
+		@del /f  $(strip $(BIN_DIR))\*.bin
+	@if exist $(strip $(BIN_DIR))\*.elf \
+		@del /f  $(strip $(BIN_DIR))\*.elf
+	@if exist $(strip $(BIN_DIR))\*.lis \
+		@del /f  $(strip $(BIN_DIR))\*.lis
+	@if exist $(strip $(BIN_DIR))\*.sym \
+		@del /f  $(strip $(BIN_DIR))\*.sym
+	@for /d %%i in ($(BUILD_DIRS)) do \
+		@if exist %%i \
+			@$(MAKE) -C %%i  cleanall
+
+cleanall:
+	@for %%y in ($(OBJS)) do \
+		@if exist ..\$(OBJDIR)\%%y \
+			@del /f ..\$(OBJDIR)\%%y
+
+
+listobj:
+	@for %%y in ($(OBJS)) do \
+		@echo .\$(OBJDIR)\%%y >> ..\$(OBJLIST)
+	
+	
+#@echo .\$(OBJDIR)\$@ >> ..\$(OBJLIST)
+
+#-------------------------------------------------------------------------------
+# C, S, CPP code inference rules
+#-------------------------------------------------------------------------------
+%.o:%.c
+	@echo Building $(OBJDIR)\$@   
+	@$(CC) $(C_FLAGS) $(INCLUDES) $(C_DEF)  --via ..\$(DEFVIATMP) -o  ..\$(OBJDIR)\$@ $<  
+
+#-------------------------------------------------------------------------------
+# Assembly code inference rules
+#-------------------------------------------------------------------------------
+%.o:%.s
+	@echo Building  $(OBJDIR)\$@ 
+	@$(ASM) $(S_FLAGS) $(S_DEF) $(ADEFS)  -o  ..\$(OBJDIR)\$@  $<
+
+
+#export  BIN_DIR ELF_OUTPUT BIN_OUTPUT  LIS_OUTPUT SYM_OUTPUT SCATTER_FILE MOD_LIST DIR_ARM DIR_TOOL DIR_ARMLIB DIR_ARMINC DIR_TOOL CC LINK ASM  AR FROMELF MAKE C_FLAGS S_FLAGS AR_FLAGS INCLUDES C_DEF OBJDIR OBJLIST
+
+
