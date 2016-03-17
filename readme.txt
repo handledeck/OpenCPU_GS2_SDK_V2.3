@@ -1,4 +1,4 @@
-111run "make help" in Flash(64+32) environment
+run "make help" in Flash(64+32) environment
 run "make clean"
 
 
