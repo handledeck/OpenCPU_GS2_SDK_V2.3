@@ -12,4 +12,7 @@ void ReadStateGpio(void);
 void CheckStateGpio(void);
 void GetTextStateGpio(char* pin);
 void GetInputDescripon(unsigned char pin,char level,unsigned char* state);
+void subscribe_light();
+void set_light_on();
+void set_light_off();
 #endif 

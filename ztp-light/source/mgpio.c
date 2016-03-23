@@ -25,8 +25,7 @@ void SetModeGpio(){
     pinLight.pinconfigversion = QL_PIN_VERSION;
      pinLight.pinparameterunion.gpioparameter.pinpullenable = QL_PINPULLENABLE_ENABLE;
      pinLight.pinparameterunion.gpioparameter.pindirection = QL_PINDIRECTION_OUT;
-     iret=Ql_pinSubscribe(QL_PINNAME_GPIO4, QL_PINMODE_2, &pinLight);    
-     //OUTD("Subscribe QL_PINNAME_GPIO4 to  gpio mode:%d\r\n",iret);
+     iret=Ql_pinSubscribe(QL_PINNAME_GPIO4, QL_PINMODE_2, &pinLight); 
      pinHigh.pinconfigversion = QL_PIN_VERSION;
      pinHigh.pinparameterunion.gpioparameter.pinpullenable = QL_PINPULLENABLE_DISABLE;
      pinHigh.pinparameterunion.gpioparameter.pindirection = QL_PINDIRECTION_OUT;
@@ -47,8 +46,41 @@ void SetModeGpio(){
        // OUTD("Subscribe pin to gpio:%d mode:%d\r\n",i,iret);
      }
      __pins=0;
+     subscribe_light();
      ReadStateGpio();
    // OUTD("Subscribe pin to gpio mode:%d\r\n",iret);
+}
+
+void subscribe_light(){
+    s32 clk,dat;
+    QlPinParameter pinparameter;
+    pinparameter.pinconfigversion = QL_PIN_VERSION;
+    pinparameter.pinparameterunion.gpioparameter.pinpullenable = QL_PINPULLENABLE_ENABLE;
+    pinparameter.pinparameterunion.gpioparameter.pindirection = QL_PINDIRECTION_OUT;
+    pinparameter.pinparameterunion.gpioparameter.pinlevel = QL_PINLEVEL_LOW;
+    clk = Ql_pinSubscribe(QL_PINNAME_SD_CLK, QL_PINMODE_2, &pinparameter);    
+    dat = Ql_pinSubscribe(QL_PINNAME_SD_DATA, QL_PINMODE_2, &pinparameter);
+    if (clk!=0 || dat!=0) {
+        OUTD("Light pin CLK not subscribe sd_clk:%d sd_data:%d",clk,dat);
+    }
+    else OUTD("Light subscribe:OK",NULL);
+}
+
+void set_light_on(){
+    s32 iret;
+    iret = Ql_pinWrite(QL_PINNAME_SD_DATA, QL_PINLEVEL_HIGH);
+    Ql_Sleep(10);
+    iret = Ql_pinWrite(QL_PINNAME_SD_CLK, QL_PINLEVEL_HIGH);
+    Ql_Sleep(10);
+    iret = Ql_pinWrite(QL_PINNAME_SD_CLK, QL_PINLEVEL_LOW);
+}
+void set_light_off(){
+    s32 iret;
+    iret = Ql_pinWrite(QL_PINNAME_SD_DATA, QL_PINLEVEL_LOW);
+    Ql_Sleep(10);
+    iret = Ql_pinWrite(QL_PINNAME_SD_CLK, QL_PINLEVEL_HIGH);
+    Ql_Sleep(10);
+    iret = Ql_pinWrite(QL_PINNAME_SD_CLK, QL_PINLEVEL_LOW);
 }
 
 void ReadStateGpio(){ 

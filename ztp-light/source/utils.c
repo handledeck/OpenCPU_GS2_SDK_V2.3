@@ -115,6 +115,17 @@ void setCommand(char* command){
     char* cmd = NULL;
     char idx=0;
     char* pch=NULL;
+    cmd = Ql_strstr(command, "LIGHTS=");
+	if (cmd){
+		cmd += 7;
+		if (Ql_strstr(cmd, "ON")){
+            set_light_on();
+        }
+        else{
+            set_light_off();
+        }
+        Ql_strcpy(&__settings.Debug[0],cmd);
+	}
 	cmd = Ql_strstr(command, "DEBUG=");
 	if (cmd){
 		cmd += 6;

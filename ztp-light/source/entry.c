@@ -16,18 +16,19 @@
 #include "socket.h"
 #include "calendar.h"
 
-bool __debug =FALSE;
-bool __log=FALSE;
-u32 __toSend=0;
-QlEventBuffer ebuf;
-u16 __numPacket=0;
-s32 __timeOutEvents=EVENT_SEND_TIMEOUT;
-EventData __currentEvData;
-settings __settings;
-bool __heap;
-u64 __start_reg_net=0;
-u32 __regnet_timeout=120*1000;
-char __version[10]="1.1\0";
+bool            __debug =FALSE;
+bool            __log=FALSE;
+u32             __toSend=0;
+QlEventBuffer   __ebuf;
+u16             __numPacket=0;
+s32             __timeOutEvents=EVENT_SEND_TIMEOUT;
+EventData       __currentEvData;
+settings        __settings;
+bool            __heap;
+u64             __start_reg_net=0;
+u32             __regnet_timeout=120*1000;
+char            __version[10]="1.1\0";
+u32             __lat_time_sync=0;
 
 bool RegisterNetwork(void);
 void GetDateTimeGSM(char* data);
@@ -69,19 +70,19 @@ void ql_entry(void)
    Ql_GetSDKVer(&ssb[0],50);
    OUTD("SDK Ver:%s",&ssb[0]);
     while (TRUE) {
-        Ql_GetEvent(&ebuf);
-        switch (ebuf.eventType) {
+        Ql_GetEvent(&__ebuf);
+        switch (__ebuf.eventType) {
         case EVENT_UARTDATA:{
             
-            if(ebuf.eventData.uartdata_evt.port==ql_uart_port3){
+            if(__ebuf.eventData.uartdata_evt.port==ql_uart_port3){
                 u8* pData;
-                pData = (u8*)ebuf.eventData.uartdata_evt.data;
-                OUTD("Need to send to all socket client:%d",ebuf.eventData.uartdata_evt.len);
-                send_all_stream((u8*)pData,ebuf.eventData.uartdata_evt.len);
+                pData = (u8*)__ebuf.eventData.uartdata_evt.data;
+                OUTD("Need to send to all socket client:%d",__ebuf.eventData.uartdata_evt.len);
+                send_all_stream((u8*)pData,__ebuf.eventData.uartdata_evt.len);
             }
             else{
                 char* pData;
-                pData = (char*)ebuf.eventData.uartdata_evt.data;
+                pData = (char*)__ebuf.eventData.uartdata_evt.data;
                 if (*pData==13 || *pData==10){
                    commandParce();
                 }
@@ -99,18 +100,24 @@ void ql_entry(void)
                     Ql_Reset(0);
 				}
 			}
-             
-			 //WriteLog("This is simple log");
-            idTm=Ql_StartTimer(&tmgprs); 
+            if (__lat_time_sync>0) {
+                  QlSysTimer st;
+                  Ql_GetLocalTime(&st);
+                  u32 cur_time=calendar_date_to_timestamp(&st);
+                if (cur_time-__lat_time_sync>TIME_SYNC) {
+                     Ql_SendToModem(ql_md_port1,"AT+QNITZ=1\n",11);   
+                }
+            }
+            idTm = Ql_StartTimer(&tmgprs); 
             break;
         }
         case EVENT_MODEMDATA:{
-            s8* mdata=(s8*)ebuf.eventData.modemdata_evt.data;
+            s8* mdata=(s8*)__ebuf.eventData.modemdata_evt.data;
             if (Ql_strstr(mdata,"Call Ready")) {
                 OUTD("Modem is ready. Try sync date time", NULL);
                 Ql_SendToModem(ql_md_port1,"AT+QLTS\n",8);
             }
-            else if (Ql_strstr(mdata,"AT+QLTS") && ebuf.eventData.modemdata_evt.len>22) {
+            else if (Ql_strstr(mdata,"AT+QLTS") && __ebuf.eventData.modemdata_evt.len>22) {
                 char* pat=Ql_strstr(mdata,"+QLTS:");
                 pat+=8;
                 u8 dtl[22];
@@ -153,7 +160,11 @@ void GetDateTimeGSM(char* data){
     if (mark=='-') 
         zone_hour*=-1;
     calendar_date_to_tz(&st,zone_hour,zone_min);
-    Ql_SetLocalTime(&st);
+     Ql_SetLocalTime(&st);
+    //добавляем 15 минут для дальнейшей синхронизации.
+    
+    __lat_time_sync=calendar_date_to_timestamp(&st)+TIME_SYNC;
+   OUTD("__lat_time_sync:%d",__lat_time_sync);
     //OUTD("%d.%d.%d %d:%d:%d zone:%d", year, month, date, hour, minute, sec,zone); 
 }
 
