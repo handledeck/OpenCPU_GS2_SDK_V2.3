@@ -37,6 +37,7 @@ char* __main_page="<html><head><style>td{border:none;font-family:Tahoma;}.al{tex
 								"<tr><td><input type='submit'  value='Save' />\r\n"
 								"<input type='button' value='Set Date time' onclick=\"javascript:var d=new Date();location.href='date?'+(d.getFullYear()-2000)+'-'+(d.getMonth()+1)+'-'+d.getDate()+'T'+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()\" />\r\n"
 								"<input type='button' value='%s' onclick=\"javascript:location.href='%s'\" />\r\n"
+                                "<input type='button' value='%s' onclick=\"javascript:location.href='%s'\" />\r\n"
 								"<input type='button' value='Get Log' onclick=\"javascript:location.href='log'\" />\r\n"
 								"<input type='button' value='Refresh' onclick=\"javascript:location.href='/'\" />\r\n"
 								"</td>"
@@ -108,6 +109,7 @@ void get_main_page(const char* message){
         Ql_GetDeviceCurrentRunState(&simcard, &creg, &cgreg, &rssi, &ber);
 	 Ql_GetLocalTime(&loct);
 	 GetTextStateGpio(&pp[0]);
+     u8 light_state=get_lights_state();
 	Ql_sprintf(__data_buf,__main_page,
 			   __str_loc_ip_addr,
                 rssi,
@@ -123,7 +125,9 @@ void get_main_page(const char* message){
                __settings.WPass,
 			    message,
 			   __est_connection ? "Stop":"Start",
-			   __est_connection ? "stop":"run"
+			   __est_connection ? "stop":"run",
+                light_state==0   ? "Lights ON" : "Lights OFF",
+                light_state==0   ? "lightson" : "lightsoff"
                );
 }
 
@@ -182,13 +186,21 @@ void page_response(){
 		bool sdt=SetLocDate(action+5);
 		get_main_page(sdt ? "Set date and time is OK":"Error set date and time");
 	}
+    else if (Ql_strstr(action,"lightson")) {
+		set_light_on();
+		get_main_page("Receive command lights on");
+	}
+    else if (Ql_strstr(action,"lightsoff")) {
+		set_light_off();
+		get_main_page("Receive command lights off");
+	}
 	else if (Ql_strstr(action,"stop")) {
 		StopEstConnection();
-		get_main_page("Recive command Stop");
+		get_main_page("Receive command Stop");
 	}
 	else if (Ql_strstr(action,"run")) {
 		nSTATE=STATE_EST_SOCKET_CREATE;
-		get_main_page("Recive command Start");
+		get_main_page("Receive command Start");
 	}
 	else if (Ql_strstr(action,"log")) {
 		u16 size=0;

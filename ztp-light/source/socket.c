@@ -330,6 +330,7 @@ void send_all_stream(u8* data,u16 len){
         if (__client[i].socketId != 0x7F && __client[i].protocol==STREAM) {
             //__client[i].send_handle(__client[i].socketId,data);
             Ql_SocketSend(__client[i].socketId,data,len);
+           
         }
     }
 }

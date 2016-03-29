@@ -47,8 +47,18 @@ void SetModeGpio(){
      }
      __pins=0;
      subscribe_light();
+     subscribe_rs485();
      ReadStateGpio();
    // OUTD("Subscribe pin to gpio mode:%d\r\n",iret);
+}
+
+void subscribe_rs485(void){
+ QlPinParameter pinparameter;
+    pinparameter.pinconfigversion = QL_PIN_VERSION;
+    pinparameter.pinparameterunion.gpioparameter.pinpullenable = QL_PINPULLENABLE_DISABLE;
+    pinparameter.pinparameterunion.gpioparameter.pindirection = QL_PINDIRECTION_OUT;
+    pinparameter.pinparameterunion.gpioparameter.pinlevel = QL_PINLEVEL_HIGH;
+    s32 ret=Ql_pinSubscribe(QL_PINNAME_SD_CMD, QL_PINMODE_2, &pinparameter); 
 }
 
 void subscribe_light(){
@@ -60,6 +70,7 @@ void subscribe_light(){
     pinparameter.pinparameterunion.gpioparameter.pinlevel = QL_PINLEVEL_LOW;
     clk = Ql_pinSubscribe(QL_PINNAME_SD_CLK, QL_PINMODE_2, &pinparameter);    
     dat = Ql_pinSubscribe(QL_PINNAME_SD_DATA, QL_PINMODE_2, &pinparameter);
+    //rs485 = Ql_pinSubscribe(QL_PINNAME_SD_CMD, QL_PINMODE_2, &pinparameter);
     if (clk!=0 || dat!=0) {
         OUTD("Light pin CLK not subscribe sd_clk:%d sd_data:%d",clk,dat);
     }
@@ -81,6 +92,14 @@ void set_light_off(){
     iret = Ql_pinWrite(QL_PINNAME_SD_CLK, QL_PINLEVEL_HIGH);
     Ql_Sleep(10);
     iret = Ql_pinWrite(QL_PINNAME_SD_CLK, QL_PINLEVEL_LOW);
+}
+
+u8 get_lights_state(void){
+    QlPinLevel pinlevel;
+    Ql_pinRead(QL_PINNAME_SIM_PRESENCE, &pinlevel);
+        if (pinlevel==QL_PINLEVEL_LOW) 
+            return 1;
+        else return 0;
 }
 
 void ReadStateGpio(){ 

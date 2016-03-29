@@ -28,7 +28,6 @@ bool            __heap;
 u64             __start_reg_net=0;
 u32             __regnet_timeout=120*1000;
 char            __version[10]="1.1\0";
-u32             __lat_time_sync=0;
 
 bool RegisterNetwork(void);
 void GetDateTimeGSM(char* data);
@@ -70,15 +69,20 @@ void ql_entry(void)
    Ql_GetSDKVer(&ssb[0],50);
    OUTD("SDK Ver:%s",&ssb[0]);
     while (TRUE) {
+        
         Ql_GetEvent(&__ebuf);
         switch (__ebuf.eventType) {
+       
         case EVENT_UARTDATA:{
-            
+            u8* pData;
+                pData = (u8*)__ebuf.eventData.uartdata_evt.data;
+                //OUTD("text:%s",pData);
             if(__ebuf.eventData.uartdata_evt.port==ql_uart_port3){
                 u8* pData;
                 pData = (u8*)__ebuf.eventData.uartdata_evt.data;
-                OUTD("Need to send to all socket client:%d",__ebuf.eventData.uartdata_evt.len);
+                //OUTD("Need to send to all socket client:%d text:%s",__ebuf.eventData.uartdata_evt.len,__ebuf.eventData.uartdata_evt.data);
                 send_all_stream((u8*)pData,__ebuf.eventData.uartdata_evt.len);
+                
             }
             else{
                 char* pData;
@@ -100,14 +104,7 @@ void ql_entry(void)
                     Ql_Reset(0);
 				}
 			}
-            if (__lat_time_sync>0) {
-                  QlSysTimer st;
-                  Ql_GetLocalTime(&st);
-                  u32 cur_time=calendar_date_to_timestamp(&st);
-                if (cur_time-__lat_time_sync>TIME_SYNC) {
-                     Ql_SendToModem(ql_md_port1,"AT+QNITZ=1\n",11);   
-                }
-            }
+            
             idTm = Ql_StartTimer(&tmgprs); 
             break;
         }
@@ -161,10 +158,10 @@ void GetDateTimeGSM(char* data){
         zone_hour*=-1;
     calendar_date_to_tz(&st,zone_hour,zone_min);
      Ql_SetLocalTime(&st);
-    //добавляем 15 минут для дальнейшей синхронизации.
+     st.minute+=1;
+     //Ql_Alarm_StartUp(&st,0);
     
-    __lat_time_sync=calendar_date_to_timestamp(&st)+TIME_SYNC;
-   OUTD("__lat_time_sync:%d",__lat_time_sync);
+    
     //OUTD("%d.%d.%d %d:%d:%d zone:%d", year, month, date, hour, minute, sec,zone); 
 }
 

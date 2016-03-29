@@ -183,7 +183,7 @@ void GprsState(){
     case STATE_LISTEN:{
         s32 ret;
         
-        ret=Ql_SocketListen(__http_socketID,__local_ip_addr,80,5);
+        ret=Ql_SocketListen(__http_socketID,__local_ip_addr,80,10);
 		if (ret<0) {
             OUTD("Error listen port:%d",ret);
             LOG("Http port error:%d",ret);
@@ -471,8 +471,11 @@ void CallBack_socket_read(u8 contexid, s8 sock, bool result, s32 error){
                       }
                    }
                    else if (__client[index].protocol==STREAM) {
-                       OUTD("stream",NULL);
-                        Ql_SendToUart(ql_uart_port3,__client[index].recvBuffer,ret);
+                       //OUTD("stream",NULL);
+                         Ql_pinWrite(QL_PINNAME_SD_CMD, QL_PINLEVEL_HIGH);
+                         s32 snd=Ql_SendToUart(ql_uart_port3,&__client[index].recvBuffer[0],ret);
+                         Ql_Sleep(25);
+                         Ql_pinWrite(QL_PINNAME_SD_CMD, QL_PINLEVEL_LOW);
                     }
                    else if ( __client[index].protocol==UPGRADE) {
                         s32 init=0;

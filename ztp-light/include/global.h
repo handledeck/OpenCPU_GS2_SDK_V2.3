@@ -21,7 +21,7 @@
 #define SYSTEM_MESSAGE_TIMER_EMPTY_RESET 505
 #define SYSTEM_MESSAGE_FILE_READ_SETTINGS 506
 #define LEN_DEBUG_BUFFER 100
-#define TIME_SYNC 1
+
 extern char __debug_buffer[];
 extern char __message_log[];
 
