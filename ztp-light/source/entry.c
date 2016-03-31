@@ -15,6 +15,7 @@
 #include "utils.h"
 #include "socket.h"
 #include "calendar.h"
+#include "scheduler.h"
 
 bool            __debug =FALSE;
 bool            __log=FALSE;
@@ -27,7 +28,7 @@ settings        __settings;
 bool            __heap;
 u64             __start_reg_net=0;
 u32             __regnet_timeout=120*1000;
-char            __version[10]="1.1\0";
+char            __version[10]="3.1\0";
 
 bool RegisterNetwork(void);
 void GetDateTimeGSM(char* data);
@@ -69,20 +70,29 @@ void ql_entry(void)
    Ql_GetSDKVer(&ssb[0],50);
    OUTD("SDK Ver:%s",&ssb[0]);
     while (TRUE) {
-        
         Ql_GetEvent(&__ebuf);
         switch (__ebuf.eventType) {
-       
         case EVENT_UARTDATA:{
             u8* pData;
                 pData = (u8*)__ebuf.eventData.uartdata_evt.data;
-                //OUTD("text:%s",pData);
+                 if(__ebuf.eventData.uartdata_evt.port==ql_uart_port1){
+                     char* cmd=Ql_strstr(pData, "$");
+                    if (cmd){
+                        OUTD("Try parse schedulers", NULL);
+                        //cmd+=10;
+                         struct schedule_config sch_cfg;
+                         s8 checker=read_schedule((u8*)cmd,&sch_cfg);
+                         if (checker!=-1) {
+                             //запись в файл расписаний
+                             OUTD("good",NULL);
+                         }
+                         else OUTD("error",NULL);
+                       }
+                 }
             if(__ebuf.eventData.uartdata_evt.port==ql_uart_port3){
                 u8* pData;
                 pData = (u8*)__ebuf.eventData.uartdata_evt.data;
-                //OUTD("Need to send to all socket client:%d text:%s",__ebuf.eventData.uartdata_evt.len,__ebuf.eventData.uartdata_evt.data);
                 send_all_stream((u8*)pData,__ebuf.eventData.uartdata_evt.len);
-                
             }
             else{
                 char* pData;
@@ -90,9 +100,11 @@ void ql_entry(void)
                 if (*pData==13 || *pData==10){
                    commandParce();
                 }
-                else{ 
-                      fillBuffer(pData);
-                    }
+                else
+                {
+                    
+                        fillBuffer(pData); 
+                }
             }
             break;
         }

@@ -216,6 +216,7 @@
 			<F N="source/files.c"/>
 			<F N="source/global.c"/>
 			<F N="source/mgpio.c"/>
+			<F N="include/scheduler.h"/>
 			<F N="source/socket.c"/>
 			<F N="source/store.c"/>
 			<F N="source/transport.c"/>
@@ -256,6 +257,7 @@
 			<F N="../qlinc/ql_tts.h"/>
 			<F N="../qlinc/ql_type.h"/>
 			<F N="../qlinc/ql_utility.h"/>
+			<F N="source/scheduler.c"/>
 			<F N="../qlinc/sdconfig.h"/>
 			<F N="include/socket.h"/>
 			<F N="/Program Files/ARM/RVCT/Data/3.1/569/include/windows/stdarg.h"/>

@@ -466,3 +466,14 @@ void calendar_add_second_to_date(struct QlSysTimerTag *date)
 		calendar_add_minute_to_date(date);
 	}
 }
+
+void calendar_datetime_from_systdatetime(struct QlSysTimerTag *date) {
+	date->day -=1;
+	date->month -=1;
+}
+
+void calendar_datetime_to_sysdatetime(struct QlSysTimerTag *date) {
+	date->day += 1;
+	date->month += 1;
+}
+

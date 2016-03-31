@@ -69,6 +69,7 @@ void GetFullTime(void);
     Ql_SendToUart(ql_uart_port1,(u8*)__debug_buffer,Ql_strlen(__debug_buffer));\
     Ql_SendToUart(ql_uart_port1,(u8*)"\r\n",2);}
 
+
 #define LOG(frm,...)\
     if(__log){\
     Ql_memset(&__message_log[0],0,COUNT_LINE_LOG);\

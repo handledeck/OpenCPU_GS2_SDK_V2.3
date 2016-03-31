@@ -39,5 +39,8 @@ void calendar_add_hour_to_date(struct QlSysTimerTag *date);
 
 void calendar_date_to_tz(struct QlSysTimerTag *date,s8 hour,u8 min);
 
+void calendar_datetime_from_systdatetime(struct QlSysTimerTag *date);
+
+void calendar_datetime_to_sysdatetime(struct QlSysTimerTag *date);
 
 #endif /* _CALENDAR_H_INCLUDED_ */
