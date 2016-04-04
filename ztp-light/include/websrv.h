@@ -41,5 +41,5 @@ bool parse_header(char* recive_buffer,u32 lenbuf);
 bool vilidation(HttpHeader *http_header);
 s32 decode_b64(const unsigned char *buftodec,unsigned char *decbuf);
 s32 encode_b64(const unsigned char *buftoenc,unsigned char *encbuf);
-
+void get_json_settings(void);
 #endif 

@@ -195,21 +195,13 @@ void GprsState(){
               //nSTATE=STATE_ING;  
             nSTATE=STATE_EST_SOCKET_CREATE;
             client_socketId_init();
-            //OUTD("client_socketId_init OK:",NULL);
         }
 		break; 
     }
     case STATE_SOCKET_CONNECT:{
-        //QlSysTimer tmr;
-       /* u16 a_port=0;
-        s8 loc_socket=-1;*/
         s32 err;
         nSTATE=STATE_ING;
             err=Ql_SocketConnect(__est_connector_socket,__settings.IP,__settings.TCP);
-			//if (err!=0) {
-                //OUTD("Error EST connect:%d",err);
-                //LOG("Error EST connect:%d",err);
-			//}
 			break; 
     }
     case STATE_SOCKET_SEND:{

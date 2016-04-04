@@ -74,36 +74,42 @@ void ql_entry(void)
         switch (__ebuf.eventType) {
         case EVENT_UARTDATA:{
             u8* pData;
-                pData = (u8*)__ebuf.eventData.uartdata_evt.data;
-                 if(__ebuf.eventData.uartdata_evt.port==ql_uart_port1){
-                     char* cmd=Ql_strstr(pData, "$");
-                    if (cmd){
-                        OUTD("Try parse schedulers", NULL);
-                        //cmd+=10;
-                         struct schedule_config sch_cfg;
-                         s8 checker=read_schedule((u8*)cmd,&sch_cfg);
-                         if (checker!=-1) {
-                             //запись в файл расписаний
-                             OUTD("good",NULL);
-                         }
-                         else OUTD("error",NULL);
-                       }
+            pData = (u8*)__ebuf.eventData.uartdata_evt.data;
+            switch (__ebuf.eventData.uartdata_evt.port) 
+            {
+               case ql_uart_port1:
+                 {
+                     if (__ebuf.eventData.uartdata_evt.len>0)
+                       {
+                         char* cmd=Ql_strstr(pData, "$");
+                         if (cmd)
+                          {
+                             OUTD("Try parse schedulers", NULL);
+                             struct schedule_config sch_cfg;
+                             s8 checker=read_schedule((u8*)cmd,&sch_cfg);
+                             if (checker!=-1)
+                             {
+                                 //запись в файл расписаний
+                                 OUTD("good",NULL);
+                              }
+                              else
+                                   OUTD("error",NULL);
+                            }
+                        }
+                        else
+                        {
+                            if (*pData==13 || *pData==10){
+                                commandParce();
+                            }
+                            else 
+                                fillBuffer(pData); 
+                        }
+                        break; 
                  }
-            if(__ebuf.eventData.uartdata_evt.port==ql_uart_port3){
-                u8* pData;
-                pData = (u8*)__ebuf.eventData.uartdata_evt.data;
-                send_all_stream((u8*)pData,__ebuf.eventData.uartdata_evt.len);
-            }
-            else{
-                char* pData;
-                pData = (char*)__ebuf.eventData.uartdata_evt.data;
-                if (*pData==13 || *pData==10){
-                   commandParce();
-                }
-                else
+                case ql_uart_port3:
                 {
-                    
-                        fillBuffer(pData); 
+                    send_all_stream((u8*)pData,__ebuf.eventData.uartdata_evt.len);
+                    break;
                 }
             }
             break;
@@ -176,6 +182,7 @@ void GetDateTimeGSM(char* data){
     
     //OUTD("%d.%d.%d %d:%d:%d zone:%d", year, month, date, hour, minute, sec,zone); 
 }
+
 
 bool RegisterNetwork(void){
 	if (Ql_GetRelativeTime()-__start_reg_net>__regnet_timeout) {

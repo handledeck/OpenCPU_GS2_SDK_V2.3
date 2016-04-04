@@ -11,6 +11,7 @@
 const char Base64Table[65] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 char* __error_page="HTTP/1.1 404 Not Found\nContent-Type: text/html\nContent-Length: 0\n\n";
 char* __ok_page="HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %d%s\r\n\r\n";
+char* __ok_json="HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d%s\r\n\r\n";
 char* __autorize="HTTP 401 Not Authorized\r\nWWW-Authenticate: Basic realm=\"insert realm\"\r\nContent-Length: %d\r\n\r\n";
 char* __download_page="HTTP/1.1 200 OK\r\ncontent-description: File Transfer\r\ncontent-type: application/octet-stream\r\ncontent-disposition: attachment; filename=log.txt\r\nContent-Length: %d\r\n\r\n";
 char* __main_page="<html><head><style>td{border:none;font-family:Tahoma;}.al{text-align:right;}</style></head>"
@@ -156,6 +157,7 @@ bool read_action(char* header,char* action) {
 void page_response(){
 	bool reset=FALSE;
 	bool prepare=TRUE;
+    bool json=FALSE;
     char* action=__header.action;
 	Ql_memset(__data_buf,0,2048);
 	Ql_memset(__s_buf,0,10240);
@@ -165,6 +167,10 @@ void page_response(){
 	else if (Ql_strstr(action,"reboot")) {
 		get_rebot_page();
 		reset=TRUE;
+	}
+    else if (Ql_strstr(action,"json_settings")) {
+        json=TRUE;
+		get_json_settings();
 	}
 	else if (Ql_strstr(action,"settings?")) {
 		char* pch=NULL;
@@ -206,11 +212,8 @@ void page_response(){
 		u16 size=0;
 		ReadLogFile(&size);
 		Ql_sprintf(__s_buf,__download_page,size);
-		//Ql_strcpy(&__s_buf[Ql_strlen(__s_buf)],__buf_log);
-		
 		Ql_memcpy(&__s_buf[Ql_strlen(__s_buf)],__buf_log,size);
 		OUTD("__download_page:%d file size:%d buffer-len:%d",Ql_strlen(__download_page),size,Ql_strlen(__s_buf));
-		
 		prepare=FALSE;
 	}
     else if (Ql_strstr(action, "autorize")) {
@@ -231,10 +234,10 @@ void page_response(){
              Ql_sprintf(__s_buf, __ok_page, Ql_strlen(__data_buf),&bcook[0]); 
         }
         else
-            Ql_sprintf(__s_buf,__ok_page,Ql_strlen(__data_buf),"");
+            Ql_sprintf(__s_buf,json ? __ok_json :__ok_page,Ql_strlen(__data_buf),"");
 		Ql_strcpy(&__s_buf[Ql_strlen(__s_buf)],__data_buf);
 	}
-	OUTD("time:%d",Ql_GetRelativeTime());
+	//OUTD("time:%d",Ql_GetRelativeTime());
 	if (reset) {
 		Ql_Sleep(10000);
 		Ql_Reset(0);
@@ -432,7 +435,59 @@ s32 decode_b64(const unsigned char *buftodec,unsigned char *decbuf)
 	return Ql_strlen((char*)decbuf);
 }
 
-
+void get_json_settings(void){
+    QlSysTimer loct;
+    ReadSettings();
+    Ql_GetLocalTime(&loct);
+     s32 simcard;
+     s32 creg;
+     s32 cgreg;
+     u8 rssi;
+     u8 ber;
+     char pp[8];
+     char date[20];
+     char ip[20];
+     Ql_GetDeviceCurrentRunState(&simcard, &creg, &cgreg, &rssi, &ber);
+     GetTextStateGpio(&pp[0]);
+     Ql_memset(ip,0,20);
+     Ql_memset(date,0,20);
+     Ql_sprintf(date,"%.2d.%.2d.%.2d %.2d:%.2d:%.2d",loct.day,loct.month,loct.year,loct.hour,loct.minute,loct.second);
+     Ql_sprintf(ip,"%d.%d.%d.%d",__settings.IP[0],__settings.IP[1],__settings.IP[2],__settings.IP[3]);
+     u8 light_state=get_lights_state();
+    Ql_sprintf(__data_buf,
+               "\"apn\":\"%s\","
+               "\"ip\":\"%s\","
+				"\"signal\":\"%d\","
+				"\"output\":\"%s\","
+				"\"date\":\"%s\","
+				"\"addr_conn\":\"%s\","
+				"\"port_conn\":\"%d\","
+				"\"empty\":\"%d\","
+				"\"debounce\":\"%d\","
+				"\"debug\":\"%s\","
+				"\"log\":\"%s\","
+				"\"web_user\":\"%s\","
+				"\"web_pass\":\"%s\","
+                "\"est_conn\":\"%d\","
+                "\"lights\":\"%d\","
+				,
+                __settings.APN,
+				__str_loc_ip_addr,
+                rssi,
+				&pp[0],
+				&date[0],
+				&ip[0],
+				__settings.TCP,
+				__settings.TSend,
+				__settings.Deboung,
+				__settings.Debug,
+				__settings.Log,
+				__settings.WUser,
+				__settings.WPass,
+               __est_connection,
+               light_state
+				);
+}
 
 
 
